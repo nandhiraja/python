@@ -17,7 +17,7 @@ def init_db():
 
 def get_items(URL):
     global date_now
-    current_product = scrape_site(URL)
+    current_product = scrape_site(URL,3)
     date_now =  datetime.now().strftime("%Y-%m-%d %H:%M")
     for item in current_product:
         update_product(item,connection)

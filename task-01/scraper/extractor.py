@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
-# URL = 'https://books.toscrape.com'
+URL = 'https://books.toscrape.com'
 
-def scrape_site(URL):
+def scrape_site(URL,limit=100000):
     print('scrapping starts.....')
     products = []
     with sync_playwright() as p :
@@ -9,7 +9,8 @@ def scrape_site(URL):
         page =  browser.new_page()
         print('Going to site : ',URL)
         page.goto(URL)
-
+        
+        page_count=0
         while True:
 
             page.wait_for_selector('.product_pod')
@@ -18,18 +19,19 @@ def scrape_site(URL):
                 item = items.nth(i)
                 name = item.locator("h3 a").get_attribute("title")
                 price = item.locator(".price_color").inner_text()
-                instock = item.locator('.availability').inner_text()
+                link = item.locator("h3 a").get_attribute("href")
                 item_detail ={
                     'name': name.strip(),
                     'price':price.strip(),
-                    'sku' : instock.strip()
+                    'sku' : link.strip()
                 }
                 products.append(item_detail)
             next_btn = page.locator("li.next a")
-
-            if next_btn.count() > 0:
+            print(next_btn.count() )
+            if next_btn.count() > 0 and page_count < limit:
                 print("Moving to next page")
                 next_btn.click()
+                page_count+=1
                 page.wait_for_load_state("networkidle")
             else:
                 print("No more pages.")
