@@ -15,7 +15,7 @@ def update_product(product ,conn):
             """, (
         product["sku"],
         product["name"],
-        float(product["price"].replace("£", "")),
+        float(product["price"]),
          datetime.now().strftime("%Y-%m-%d %H:%M")
     ))
 
@@ -26,4 +26,4 @@ def get_products(date, connection ):
         cur.execute("SELECT * FROM products WHERE last_updated  = ?",
                     (date,)
                       )
-        return {row[1]: row for row in cur.fetchall()} 
+        return {row[1]: {'id': row[0],'name':row[1],'price':row[2],'date':row[3]} for row in cur.fetchall()} 
