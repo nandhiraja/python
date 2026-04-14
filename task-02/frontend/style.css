@@ -1,0 +1,136 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+
+    min-height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: .8fr 3fr;
+    grid-template-areas: 'aside chatArea';
+    background: linear-gradient(90deg, rgb(37, 37, 37), rgb(28, 28, 28));
+   
+}
+
+aside{
+    grid-area: 'aside';
+    padding: 1rem;
+    background-color: rgb(26, 25, 25);
+    color:aliceblue;
+    font-size: 20px;
+}
+.contacts{
+    margin: 1rem auto;
+    padding: 1.3rem;
+    border-radius: 10px;
+
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.23);
+}
+
+.app-name{
+    padding-bottom:2rem;
+    padding-top: 3rem;
+    font-size: 2rem;
+    text-shadow: 1px 2px 2px;
+}
+
+#chat-container{
+    grid-area: chatArea;
+    margin:1rem;
+
+}
+#user-name{
+    color:white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 30px;
+    font-weight: 700; 
+    padding:2rem;
+    padding-left:3rem ;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    background-color: rgb(24, 24, 24);
+    border-bottom:1px solid rgba(233, 229, 229, 0.522) ;
+}
+
+#chat-area{
+    display: flex;
+    padding: 1rem 2rem;
+    height: 100%;
+    max-height: 79vh;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+#chat-area::-webkit-scrollbar{
+    display:none;
+}
+
+.message{
+    padding: 1rem 2rem;
+    width: max-content;
+    font-size: 20px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color:aliceblue
+
+}
+
+.sender{
+    align-self: end;
+    background-color: rgb(5, 120, 81);
+    border-radius: 20px;
+    border-top-right-radius: 0px;
+}
+
+.receiver{
+    background-color: rgb(5, 90, 164);
+    border-radius: 20px;
+    border-top-left-radius: 0px;
+
+}
+
+
+
+.timestamp{
+    font-size: 13px;
+    color: rgba(240, 248, 255, 0.553);
+    font-weight: 300;
+    padding-top: .6rem
+}
+.receiver-time{
+    justify-self: end;
+}
+
+#input-area{
+    margin: auto;
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    background-color: rgba(2, 12, 73, 0.495);
+    padding: 1rem 1rem;
+
+    input{
+        font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        width: 100%;
+        margin: auto 1rem;
+        height: 2rem;
+        padding-left: 10px;
+        font-size: 15px;
+        border-radius: 20px;
+    }
+
+}
+
+
+#send-btn{
+    background-color: green;
+    color: azure;
+    padding: 10px;
+    border-radius:20px;
+}
+
