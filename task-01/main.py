@@ -5,7 +5,6 @@ from settings import URL
 from datetime import datetime
 from database.db_model import CREATE_TABLE
 from report import generate_report
-import json
 import random
 connection = get_connection()
 date_now = ''
@@ -22,7 +21,7 @@ def get_items(URL):
     current_product = scrape_site(URL,1)
     date_now =  datetime.now().strftime("%Y-%m-%d %H:%M")
     for item in current_product:
-        random_value = random.choice([0,1])
+        random_value = random.choice([0,1,5,9])
         item['price']= item['price'].replace("£", "")
         item['price'] = float(item['price'])+random_value
 
