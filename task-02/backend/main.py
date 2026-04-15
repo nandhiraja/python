@@ -15,7 +15,8 @@ class ConnectionManager:
 
     async def send_personal_message(self, message: str, user_id: str):
         if user_id in self.active_connections:
-            await self.active_connections[user_id].send_text(message)
+            print("sending to client: ", user_id)
+            await self.active_connections[user_id].send_json(message)
 
 manager = ConnectionManager()
 
@@ -24,8 +25,15 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
     await manager.connect(user_id, websocket)
     try:
         while True:
-            data = json.loads(await websocket.receive_text())            
-            await manager.send_personal_message(f"message: {data['message']}", data['user'] )
+            data = json.loads(await websocket.receive_text())   
+            print(data) 
+            message = {'user':data['user'],
+                       'text': data['message'],
+                       'room': data['room'] ,
+                       'timestamp': data['timestamp']
+                       } 
+            print(message) 
+            await manager.send_personal_message(message, data['receiver'] )
 
 
     except WebSocketDisconnect:
