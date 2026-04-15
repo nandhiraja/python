@@ -7,16 +7,37 @@
     </head>
     <body>
           <aside>
-            <div class="app-name">WeTalk </div>
-            <div class="contacts active">Friend</div>
-            <div class="contacts"> Office</div>
-            <div class="contacts"> Relative</div>
+            <div class="app-name">WeTalk 
+                <select id="user-id">
+                        <option value="login">Login</option> 
+                        <option value="login">Nandhiraja</option>  
+                        <option value="login">Ragu</option> 
+                        <option value="login">Guest</option> 
 
+                </select>
+            </div>
+            <div class="active-rooms">Active Rooms
+            <div class="room-join">
+                <input type="text" id="room-join-input">
+                <button id="room-join-btn">Join</button>
+            </div>
+            <div id='general' data-room-id='general'class="room open">General
+                    <div class="typing-indicator">Typing....</div>
+
+            </div>
+            <div id='office'  data-room-id='office'class="room"> Office</div>
+            <div id='Coder'   data-room-id='coder'class="room"> Coder</div>
+           </div>
+           
         </aside>
         <section id="chat-container">
 
         <header>
-            <h2 id="user-name">My-Friend</h2>
+            <h2 id="user-name">General | Room</h2>
+            <div class="online-status">Online 3
+            <div class="typing-indicator">Typing....</div>
+            </div>
+
         </header>
 
         <section id="chat-area">
@@ -29,7 +50,7 @@
                 <div class="receiver-time timestamp">10:25 pm</div>
             </div>
         </section>
-          <section id="input-area">
+          <section class="input-area">
             <input id='user-input' "type="text" autofocus placeholder="Type message">
             <button id="send-btn">Send</button>
           </section>
