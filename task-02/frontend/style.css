@@ -86,12 +86,15 @@ header{
     background-color: rgb(5, 120, 81);
     border-radius: 20px;
     border-top-right-radius: 0px;
+    margin: .3rem 0rem;
 }
 
 .receiver{
     background-color: rgb(5, 90, 164);
     border-radius: 20px;
     border-top-left-radius: 0px;
+    margin: .3rem 0rem;
+
 
 }
 
