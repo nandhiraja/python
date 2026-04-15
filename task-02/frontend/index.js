@@ -4,12 +4,13 @@ let login =  document.getElementById('user-id')
 let currentRoom = 'general'; 
 let ws =  null
 let currentUser=null
-let receiver = 'ragu'
+let joinBtn = document.getElementById('room-join-btn')
+
 
 login.addEventListener('change',()=>{
     console.log('login : ', login.value)
     
-    let currentUser = login.value
+    currentUser = login.value
    
     if (currentUser!='login'){
         if(currentUser=='ragu'){
@@ -38,8 +39,8 @@ login.addEventListener('change',()=>{
 const sendMessage = () => {
     const text = input.value;
     if (text.trim() === "") return;
-    let sender = login.value
-    if (sender=='login'){
+    let currentUser = login.value
+    if (currentUser=='login'){
         return
     }
 
@@ -57,8 +58,7 @@ const sendMessage = () => {
     const messageData = {
         type: 'chat-message',
         room: currentRoom,
-        user: sender,
-        receiver:receiver,
+        user: currentUser,
         message: text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
@@ -73,14 +73,27 @@ sendBtn.addEventListener('click', sendMessage);
 
 function displayMessage(data) {
     const chatArea = document.getElementById('chat-area');
-    const isMe = data.user === currentUser;
     
     const msgHtml = `
-        <div class="${isMe ? 'sender' : 'receiver'} message">
+        <div class="${'receiver'} message">
             <strong>${data.user}:</strong> ${data.text}
-            <div class="${isMe ? 'sender-time' : 'receiver-time'} timestamp">${data.timestamp}</div>
+            <div class="${'sender-time'} timestamp">${data.timestamp}</div>
         </div>
     `;
     chatArea.innerHTML += msgHtml;
     chatArea.scrollTop = chatArea.scrollHeight; 
 }
+
+joinBtn.addEventListener('click',()=>{
+    let joinRoom = document.getElementById('room-join-input')
+    console.log(joinRoom.value)
+    let message = {
+        type:'room-join',
+        user:currentUser,
+        room:currentRoom
+
+    }
+    ws.send(JSON.stringify(message));
+
+    
+})
