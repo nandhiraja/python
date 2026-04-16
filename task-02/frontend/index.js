@@ -68,9 +68,12 @@ login.addEventListener('change',()=>{
         setTimeout(()=>{
             let typing = document.getElementById('typing-indicator')
             typing.style.display='none'
-        },2000)
-        
+        },2000)       
 
+    }
+    else if(data.type =='activate-room'){
+        console.log("Activate rooms...",data.activatedRoom)
+        setTimeout(()=>{activateRoom(data.activatedRoom)},50)
     }
     updateOnline()
     };
@@ -85,9 +88,10 @@ function addRoomEventListener(){
     roomsList.forEach(room=>{
         room.addEventListener('click',(e)=>{
             let roomId = e.target.dataset.roomId
-            console.log("Room clicked", roomId)
+            console.log("Room clicked", e)
             previousRoom=currentRoom
-            currentRoom = roomId
+
+            currentRoom = e.target.id
             updateRoom()
             updateActive()
             let message = {
@@ -143,6 +147,22 @@ function updateOnline(){
 function updateRoom(){
     document.getElementById('user-name').innerText=currentRoom+" | Room"
 }
+
+function activateRoom(activateList){
+    activateList.forEach(room=>{
+     
+        const curRoom = document.querySelector(`[data-room-id="${room}"]`);
+
+        console.log("Checking room:", room, curRoom);
+
+        if (curRoom) {
+            if (curRoom.classList.contains('not-access')) {
+                curRoom.classList.remove('not-access');
+            }
+        } 
+    
+    })
+}
 updateOnline()
 updateActive()
 function displayMessage(data) {
@@ -180,8 +200,10 @@ function updateRooms(){
     availableRooms.forEach(room=>{
         let div = document.createElement('div')
         div.id =room
+        div.classList.add('not-access')
+
         div.classList.add('room')
-        div.dataset.roomId=room
+        div.dataset.roomId=room.toLowerCase()
         div.innerText=room
         roomArea.appendChild(div)
         
