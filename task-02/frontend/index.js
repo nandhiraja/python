@@ -46,14 +46,44 @@ login.addEventListener('change',()=>{
         availableRooms= data.availableRooms
         updateRooms()
     }
-    else if (data.type === 'chat-message') {
-        displayMessage(data);
+    else if(data.type==='chat-history'){
+        console.log('displaying history...')
+        document.getElementById('chat-area').innerHTML='';
+
+        data.history.forEach(message=>{
+            displayMessage(message)
+        })
+    }
+    else if (data.type === 'chat-message' && data.user!=currentUser) {
+       
+         displayMessage(data);
+      
+        
     }
     };
 
     }
 
 })
+
+function addRoomEventListener(){
+    let roomsList = document.querySelectorAll('.room')
+
+    roomsList.forEach(room=>{
+        room.addEventListener('click',(e)=>{
+            let roomId = e.target.dataset.roomId
+            console.log("Room clicked", roomId)
+            let message = {
+                type:"chat-history",
+                user: currentUser,
+                room:roomId   
+            }
+            ws.send(JSON.stringify(message))
+        })
+    })
+}
+
+
 const sendMessage = () => {
     const text = input.value;
     if (text.trim() === "") return;
@@ -62,16 +92,7 @@ const sendMessage = () => {
         return
     }
 
-    const chatArea = document.getElementById('chat-area');
     
-    const msgHtml = `
-        <div class="${'sender'} message">
-            <strong>${'You'}:</strong> ${text}
-            <div class="${'receiver-time'} timestamp">${ new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-        </div>
-    `;
-    chatArea.innerHTML += msgHtml;
-    chatArea.scrollTop = chatArea.scrollHeight;
 
     const messageData = {
         type: 'chat-message',
@@ -91,11 +112,11 @@ sendBtn.addEventListener('click', sendMessage);
 
 function displayMessage(data) {
     const chatArea = document.getElementById('chat-area');
-    
+    const isMe = data.user===currentUser
     const msgHtml = `
-        <div class="${'receiver'} message">
-            <strong>${data.user}:</strong> ${data.text}
-            <div class="${'sender-time'} timestamp">${data.timestamp}</div>
+        <div class="${isMe? 'sender':'receiver'} message">
+            <p style='color:black'>${isMe? '':data.user+': '}</p> ${data.text}
+            <div class="${'receiver-time'} timestamp">${data.timestamp}</div>
         </div>
     `;
     chatArea.innerHTML += msgHtml;
@@ -128,4 +149,5 @@ function updateRooms(){
         roomArea.appendChild(div)
         
     })
+    addRoomEventListener()
 }

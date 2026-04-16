@@ -55,7 +55,12 @@ class ConnectionManager:
             await self.active_connections[user_id].send_json(message)
     
     async def send_history(self,room,websocket:WebSocket):
-        await websocket.send_json(self.rooms_history[room])
+        message = {
+            'type':'chat-history',
+            'room':room,
+            'history': self.rooms_history[room]
+        }
+        await websocket.send_json(message)
 
     async def update_history(self,room,message):
         self.rooms_history[room].append(message)
@@ -73,19 +78,22 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 
             elif(data['type']=='chat-message'):
                 print(data) 
-                message = {'user':data['user'],
+                message = { 'type':'chat-message',
+                            'user':data['user'],
                            'text': data['message'],
                            'room': data['room'] ,
                            'timestamp': data['timestamp']
                            } 
                 print(message) 
                 await manager.broadcast(data['room'].lower(),message )
+                await manager.update_history(data['room'].lower(),message )
+
 
             elif(data['type']=='initial-data'):
                await manager.send_initial_data(data['user'],websocket)
 
             elif(data['type']=='chat-history'):
-                await manager.send_history(data['room'],websocket)              
+                await manager.send_history(data['room'].lower(),websocket)              
                  
             else:
                 print("Sorry no process......")
