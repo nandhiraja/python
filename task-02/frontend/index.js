@@ -5,7 +5,7 @@ let currentRoom = 'general';
 let ws =  null
 let currentUser=null
 let joinBtn = document.getElementById('room-join-btn')
-
+let availableRooms = []
 
 login.addEventListener('change',()=>{
     console.log('login : ', login.value)
@@ -26,13 +26,31 @@ login.addEventListener('change',()=>{
      console.log('new Connection : ',currentUser)
 
     ws =  new WebSocket(`ws://localhost:8080/ws/${currentUser}`)
+
+    ws.onopen=()=>{
+        const messageData = {
+        type: 'initial-data',
+        user: currentUser,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+    ws.send(JSON.stringify(messageData));
+    }
+    
     ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
+
     console.log("Socket_data : ",data)
-    if (data.room === currentRoom) {
+    if(data.type =='available-rooms'){
+        console.log('got avilable rooms')
+        availableRooms= data.availableRooms
+        updateRooms()
+    }
+    else if (data.type === 'chat-message') {
         displayMessage(data);
     }
-};
+    };
+
     }
 
 })
@@ -97,3 +115,17 @@ joinBtn.addEventListener('click',()=>{
 
     
 })
+
+function updateRooms(){
+    let roomArea = document.querySelector('.room-area');
+    roomArea.innerHTML=''
+
+    availableRooms.forEach(room=>{
+        let div = document.createElement('div')
+        div.classList.add('room')
+        div.dataset.roomId=room
+        div.innerText=room
+        roomArea.appendChild(div)
+        
+    })
+}
