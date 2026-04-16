@@ -1,11 +1,13 @@
 let input = document.getElementById('user-input')
 let sendBtn = document.getElementById('send-btn')
 let login =  document.getElementById('user-id')
-let currentRoom = 'general'; 
+let currentRoom = null; 
 let ws =  null
 let currentUser=null
 let joinBtn = document.getElementById('room-join-btn')
 let availableRooms = []
+let previousRoom =null
+let online =0
 
 login.addEventListener('change',()=>{
     console.log('login : ', login.value)
@@ -54,12 +56,23 @@ login.addEventListener('change',()=>{
             displayMessage(message)
         })
     }
-    else if (data.type === 'chat-message' && data.user!=currentUser) {
-       
-         displayMessage(data);
-      
+    else if (data.type === 'chat-message' ) {
+                online= data.online
+                displayMessage(data);     
         
     }
+    else if (data.type =='typing' && data.user!=currentUser){
+        let typing = document.getElementById('typing-indicator')
+        typing.innerText = data.user+" typing..."
+        typing.style.display='block'
+        setTimeout(()=>{
+            let typing = document.getElementById('typing-indicator')
+            typing.style.display='none'
+        },2000)
+        
+
+    }
+    updateOnline()
     };
 
     }
@@ -73,6 +86,10 @@ function addRoomEventListener(){
         room.addEventListener('click',(e)=>{
             let roomId = e.target.dataset.roomId
             console.log("Room clicked", roomId)
+            previousRoom=currentRoom
+            currentRoom = roomId
+            updateRoom()
+            updateActive()
             let message = {
                 type:"chat-history",
                 user: currentUser,
@@ -109,7 +126,25 @@ const sendMessage = () => {
 sendBtn.addEventListener('click', sendMessage);
 
 
-
+function updateActive(){
+    if(currentRoom!=null){
+    let room =  document.getElementById(currentRoom)
+    room.classList.add('open')
+    }
+    if(previousRoom!=null){
+    let prevRoom =  document.getElementById(previousRoom)
+    prevRoom.classList.remove('open')
+    }
+}
+function updateOnline(){
+    document.querySelector('.online-status').innerText=`Online: ${online}`
+    
+}
+function updateRoom(){
+    document.getElementById('user-name').innerText=currentRoom+" | Room"
+}
+updateOnline()
+updateActive()
 function displayMessage(data) {
     const chatArea = document.getElementById('chat-area');
     const isMe = data.user===currentUser
@@ -124,12 +159,13 @@ function displayMessage(data) {
 }
 
 joinBtn.addEventListener('click',()=>{
-    let joinRoom = document.getElementById('room-join-input')
-    console.log(joinRoom.value)
+    let joinRoom = document.getElementById('room-join-input').value
+    console.log("Join room : ",joinRoom)
+
     let message = {
         type:'room-join',
         user:currentUser,
-        room:currentRoom
+        room:joinRoom
 
     }
     ws.send(JSON.stringify(message));
@@ -143,6 +179,7 @@ function updateRooms(){
 
     availableRooms.forEach(room=>{
         let div = document.createElement('div')
+        div.id =room
         div.classList.add('room')
         div.dataset.roomId=room
         div.innerText=room
@@ -151,3 +188,12 @@ function updateRooms(){
     })
     addRoomEventListener()
 }
+
+let inputBox = document.getElementById('user-input');
+inputBox.addEventListener('input',()=>{
+    ws.send(JSON.stringify({
+        type:'typing',
+        user:currentUser,
+        room:currentRoom
+    }))
+})
