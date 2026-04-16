@@ -24,34 +24,24 @@
                     <input type="text" id="room-join-input">
                     <button id="room-join-btn">Join</button>
                 </div>
-
-                    <div data-room-id='general'class="room open">General
-                            <div class="typing-indicator">Typing.... </div>                    
-                    </div>
-                    <div    data-room-id='office'class="room"> Office</div>
-                    <div    data-room-id='coder'class="room"> Coder</div>
+                <div class="room-area">
+                    <!-- available room will fill in runtime -->
+                </div>
            </div>
            
         </aside>
         <section id="chat-container">
 
         <header>
-            <h2 id="user-name">General | Room</h2>
-            <div class="online-status">Online 0
-            <div class="typing-indicator" style="display: none;">Typing....</div>
+            <h2 id="user-name">Welcome to WeTalk</h2>
+            <div class="online-status" style="display: none;">Online 0
+            <div id="typing-indicator" style="display: none;">Typing....</div>
             </div>
 
         </header>
 
         <section id="chat-area">
-            <!-- <div class="sender message">
-                Hello,How are you?
-                <div class="sender-time timestamp">10:24 pm</div>
-            </div>
-            <div class="receiver message">
-                I'am fine,what about you?
-                <div class="receiver-time timestamp">10:25 pm</div>
-            </div> -->
+          <!-- Chat message are update by backend -->
         </section>
           <section class="input-area">
             <input id='user-input' "type="text" autofocus placeholder="Type message">
