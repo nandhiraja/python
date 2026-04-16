@@ -204,3 +204,22 @@ header{
 .typing-indicator{
     color: rgb(231, 231, 231);
 }
+
+.not-access{
+    background-color: rgb(47, 46, 46);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+@media (max-width:1000px) {
+    #room-join-input{
+    width: auto;   
+    font-size: .8rem;
+
+}
+    body{ 
+    grid-template-columns: 1.5fr 3fr;  
+   
+}
+
+
+}
