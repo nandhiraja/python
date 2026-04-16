@@ -6,11 +6,19 @@ class ConnectionManager:
     def __init__(self):
         self.rooms:dict= {'general':[],
                           'office':[],
-                          'coder':[]
+                          'coder':[],
+                          'designer':[],
+                          'helper':[]
                           }
         
         self.user_map: dict ={}
         self.active_connections: dict = {} 
+        self.rooms_history : dict ={'general':[],
+                                     'office':[],
+                                     'coder':[],
+                                     'designer':[],
+                                     'helper':[]
+                                     }
 
     async def connect(self, user_id: str, websocket: WebSocket):
         await websocket.accept()
@@ -29,12 +37,28 @@ class ConnectionManager:
         if room in self.rooms:
             for connection in self.rooms[room]:
                 await connection.send_json(message)
-
+    async def send_initial_data(self,user_id:str,websocket:WebSocket):
+        rooms =[]
+        
+        for room in self.rooms.keys():
+            rooms.append(room.capitalize())
+        message={
+            'type':'available-rooms',
+            'user':user_id,
+            'availableRooms':rooms
+        }
+        await websocket.send_json(message)
 
     async def send_personal_message(self, message: str, user_id: str):
         if user_id in self.active_connections:
             print("sending to client: ", user_id)
             await self.active_connections[user_id].send_json(message)
+    
+    async def send_history(self,room,websocket:WebSocket):
+        await websocket.send_json(self.rooms_history[room])
+
+    async def update_history(self,room,message):
+        self.rooms_history[room].append(message)
 
 manager = ConnectionManager()
 
@@ -45,7 +69,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
         while True:
             data = json.loads(await websocket.receive_text())
             if(data['type']=='room-join'):
-                await manager.join_room(data['room'],websocket)
+                await manager.join_room(data['room'].lower(),websocket)
 
             elif(data['type']=='chat-message'):
                 print(data) 
@@ -55,7 +79,14 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
                            'timestamp': data['timestamp']
                            } 
                 print(message) 
-                await manager.broadcast(data['room'],message )
+                await manager.broadcast(data['room'].lower(),message )
+
+            elif(data['type']=='initial-data'):
+               await manager.send_initial_data(data['user'],websocket)
+
+            elif(data['type']=='chat-history'):
+                await manager.send_history(data['room'],websocket)              
+                 
             else:
                 print("Sorry no process......")
 
