@@ -51,7 +51,6 @@ header{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 1rem;
     font-weight: 700; 
-    padding:2rem;
     padding-left:3rem ;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -196,15 +195,26 @@ header{
 }
 
 .online-status{
-    padding-top: 1rem ;
     color: aquamarine;
     display: flex;
-    gap: 1rem;
+    /* padding-left: 2rem; */
 }
-.typing-indicator{
+#typing-indicator{
+    /* color: gray;  */
+    font-style: italic;
+    /* padding-left: 1rem ; */
     color: rgb(231, 231, 231);
 }
-
+.head-info{
+    display: flex;
+    padding:2rem;
+    padding-top: 0;
+    gap:2rem
+}
+header h2{
+    margin: 2rem;
+    margin-bottom: .5rem;
+}
 .not-access{
     background-color: rgb(47, 46, 46);
     cursor: not-allowed;
