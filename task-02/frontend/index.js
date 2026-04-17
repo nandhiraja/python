@@ -15,12 +15,7 @@ login.addEventListener('change',()=>{
     currentUser = login.value
    
     if (currentUser!='login'){
-        if(currentUser=='ragu'){
-        receiver='Nandhiraja'
-        }
-        else{
-          receiver = 'ragu'  
-        }
+        
         if(ws){
         console.log('Connection closed: ',currentUser)
         ws.close()
@@ -45,11 +40,15 @@ login.addEventListener('change',()=>{
     console.log("Socket_data : ",data)
     if(data.type =='available-rooms'){
         console.log('got avilable rooms')
+        online =data.online-1
+
         availableRooms= data.availableRooms
         updateRooms()
     }
     else if(data.type==='chat-history'){
         console.log('displaying history...')
+        online =data.online-1
+
         document.getElementById('chat-area').innerHTML='';
 
         data.history.forEach(message=>{
@@ -57,13 +56,16 @@ login.addEventListener('change',()=>{
         })
     }
     else if (data.type === 'chat-message' ) {
-                online= data.online
-                displayMessage(data);     
+                online= data.online-1
+                displayMessage(data);
+     
         
     }
     else if (data.type =='typing' && data.user!=currentUser){
         let typing = document.getElementById('typing-indicator')
-        typing.innerText = data.user+" typing..."
+        console.log("Tpyonh in ", typing)
+        let typerName =  data.user.charAt(0).toUpperCase() + data.user.slice(1); 
+        typing.innerText = typerName+" typing..."
         typing.style.display='block'
         setTimeout(()=>{
             let typing = document.getElementById('typing-indicator')
@@ -73,7 +75,9 @@ login.addEventListener('change',()=>{
     }
     else if(data.type =='activate-room'){
         console.log("Activate rooms...",data.activatedRoom)
-        setTimeout(()=>{activateRoom(data.activatedRoom)},50)
+        setTimeout(()=>{activateRoom(data.activatedRoom)                  
+
+        },50)
     }
     updateOnline()
     };
@@ -141,7 +145,9 @@ function updateActive(){
     }
 }
 function updateOnline(){
+    if(online>0){
     document.querySelector('.online-status').innerText=`Online: ${online}`
+    }
     
 }
 function updateRoom(){
@@ -152,7 +158,7 @@ function activateRoom(activateList){
     activateList.forEach(room=>{
      
         const curRoom = document.querySelector(`[data-room-id="${room}"]`);
-
+         updateOnline()
         console.log("Checking room:", room, curRoom);
 
         if (curRoom) {
@@ -163,14 +169,16 @@ function activateRoom(activateList){
     
     })
 }
-updateOnline()
+// updateOnline()
 updateActive()
 function displayMessage(data) {
     const chatArea = document.getElementById('chat-area');
     const isMe = data.user===currentUser
+    let name =  data.user.charAt(0).toUpperCase() + data.user.slice(1); 
+
     const msgHtml = `
         <div class="${isMe? 'sender':'receiver'} message">
-            <p style='color:black'>${isMe? '':data.user+': '}</p> ${data.text}
+            <p style='color:black'>${isMe? '':name+': '}</p> ${data.text}
             <div class="${'receiver-time'} timestamp">${data.timestamp}</div>
         </div>
     `;
@@ -212,10 +220,20 @@ function updateRooms(){
 }
 
 let inputBox = document.getElementById('user-input');
-inputBox.addEventListener('input',()=>{
+let isTypingSent = false;
+
+inputBox.addEventListener('input', () => {
+    if (isTypingSent || !currentRoom) return;
+
+    isTypingSent = true;
+    console.log("Sending typing message....")
     ws.send(JSON.stringify({
-        type:'typing',
-        user:currentUser,
-        room:currentRoom
-    }))
-})
+        type: 'typing',
+        user: currentUser,
+        room: currentRoom.toLowerCase()
+    }));
+
+    setTimeout(() => {
+        isTypingSent = false;
+    }, 2000);
+});
