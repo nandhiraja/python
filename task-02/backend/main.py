@@ -62,6 +62,7 @@ class ConnectionManager:
         message={
             'type':'available-rooms',
             'user':user_id,
+            'online':len(self.active_connections),
             'availableRooms':rooms
         }
         await websocket.send_json(message)
@@ -75,10 +76,13 @@ class ConnectionManager:
         message = {
             'type':'chat-history',
             'room':room,
+            'online':len(self.active_connections),
+
             'history': self.rooms_history[room]
         }
         await websocket.send_json(message)
     async def send_typing_info(self,user_id,room):
+        print('sending.. typing to frontend')
         message={
             'type':'typing',
              'user':user_id,
@@ -87,6 +91,7 @@ class ConnectionManager:
         if room in self.rooms:
             for connection in self.rooms[room]:
                 await connection.send_json(message)
+                
 
     async def update_history(self,room,message):
         self.rooms_history[room].append(message)
@@ -123,6 +128,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
             elif(data['type']=='chat-history'):
                 await manager.send_history(data['room'].lower(),websocket)              
             elif(data['type']=='typing'):
+                print("receive typing......",data)
+
                 await manager.send_typing_info(data['user'],data['room'])
             else:
                 print("Sorry no process......")
