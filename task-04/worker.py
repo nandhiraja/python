@@ -16,6 +16,7 @@ def process_task(task):
 
 def worker(worker_id):
 
+    print(f"[WORKER-{worker_id}] Started")
 
     while True:
         task_data = redis_connection.rpop(QUEUE_NAME)
@@ -26,6 +27,7 @@ def worker(worker_id):
 
         task = json.loads(task_data)
         task_id = task["id"]
+        print(f"[WORKER-{worker_id}] Picked task {task_id} ({task['func']})")
 
 
         start_time = time.time()
@@ -34,15 +36,19 @@ def worker(worker_id):
             result = process_task(task)
             duration = round(time.time() - start_time, 2)
 
+            print(f"[WORKER-{worker_id}] SUCCESS {task_id} in {duration} >>{result}")
 
         except Exception as e:
             task["retries"] += 1
 
             if task["retries"] <= task["max_retries"]:
                 delay = 2 ** task["retries"]
+                print(f"[WORKER-{worker_id}] FAILED {task_id} ({e}) >> retry {task['retries']} in {delay}s")
 
                 time.sleep(delay)
                 redis_connection.lpush(QUEUE_NAME, json.dumps(task))
 
             else:
+                print(f"[WORKER-{worker_id}] FAILED {task_id} ({e}) >> retry {task['retries']} in {delay}s")
+
                 redis_connection.lpush(DEAD_TASK_NAME, json.dumps(task))
