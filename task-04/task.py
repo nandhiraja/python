@@ -15,3 +15,11 @@ def send_sms(phone, message):
 def send_notification(user_id, message):
     return f"Notification sent to user {user_id}"
 
+
+FUNCTIONS = {
+    "add": add,
+    "send_email": send_email,
+    "generate_thumbnail": generate_thumbnail,
+    "send_notification":send_notification,
+    "send_sms":send_sms
+}
