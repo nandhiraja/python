@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Sales Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .summary-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .summary-box table {
+            width: 100%;
+        }
+        .summary-box td {
+            padding: 5px;
+            font-size: 14pt;
+        }
+        .warning {
+            color: #c0392b;
+            background-color: #f9ebea;
+            border-left: 5px solid #c0392b;
+            padding: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .chart-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        img {
+            max-width: 100%;
+        }
+        .footer {
+            text-align: right;
+            font-size: 10pt;
+            color: #7f8c8d;
+        }
+        table.region-data {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table.region-data th, table.region-data td {
+            border: 1px solid #bdc3c7;
+            padding: 8px;
+            text-align: left;
+        }
+        table.region-data th {
+            background-color: #34495e;
+            color: white;
+        }
+        .text-green { color: green; }
+        .text-red { color: red; }
+    </style>
+</head>
+<body>
+
+    <div id="footer_content" class="footer">
+        Page <pdf:pagenumber> of <pdf:pagecount> | Generated on {{ generated_time }}
+    </div>
+
+    <div class="header">
+        <h1>MONTHLY SALES REPORT</h1>
+        <h2 style="text-align: center;">{{ month_name }} {{ year }}</h2>
+    </div>
+
+    <div class="summary-box">
+        <table>
+            <tr>
+                <td><strong>Total Revenue:</strong></td>
+                <td>${{ "{:,.0f}".format(total_revenue) }}</td>
+                <td><strong>Avg Order Value:</strong></td>
+                <td>${{ "{:,.2f}".format(avg_order_value) }}</td>
+            </tr>
+            <tr>
+                <td><strong>Units Sold:</strong></td>
+                <td>{{ "{:,}".format(total_units) }}</td>
+                <td><strong>MoM Growth:</strong></td>
+                <td class="{{ 'text-green' if mom_growth >= 0 else 'text-red' }}">
+                    {{ "+" if mom_growth > 0 else "" }}{{ "{:.1f}".format(mom_growth) }}%
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    {% if declining_regions %}
+        <div class="warning">
+            ⚠ Warning: The following regions experienced negative Month-over-Month growth:<br>
+            <ul>
+                {% for r in declining_regions %}
+                <li>{{ r.region }} declined {{ "{:.1f}".format(r.growth | abs) }}% MoM</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <h2>Revenue by Region</h2>
+    <table class="region-data">
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Revenue</th>
+                <th>Units</th>
+                <th>MoM Growth</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in region_stats %}
+            <tr>
+                <td>{{ r.region }}</td>
+                <td>${{ "{:,.0f}".format(r.revenue) }}</td>
+                <td>{{ "{:,}".format(r.units) }}</td>
+                <td class="{{ 'text-green' if r.growth >= 0 else 'text-red' }}">
+                    {{ "+" if r.growth > 0 else "" }}{{ "{:.1f}".format(r.growth) }}%
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="chart-container">
+        <h2>Regional Revenue Breakdown</h2>
+        <img src="data:image/png;base64,{{ bar_chart_b64 }}">
+    </div>
+
+    <div style="page-break-before: always;"></div>
+
+    <div class="chart-container">
+        <h2>Daily Sales Trend</h2>
+        <img src="data:image/png;base64,{{ line_chart_b64 }}">
+    </div>
+
+</body>
+</html>
